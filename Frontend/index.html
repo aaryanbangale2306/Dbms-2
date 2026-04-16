@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="NexaRide - Advanced Ride Sharing Database Management System Dashboard">
+    <title>NexaRide | DBMS Admin Console</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <link rel="stylesheet" href="./style.css">
+</head>
+<body>
+
+    <div class="blob blob-1"></div>
+    <div class="blob blob-2"></div>
+    <div class="blob blob-3"></div>
+    <div class="grid-overlay"></div>
+
+    <div class="app-shell">
+
+        <!-- ═══════════════ SIDEBAR ═══════════════ -->
+        <aside class="sidebar glass-deep" id="sidebar">
+            <div class="brand">
+                <div class="brand-logo"><i class="fa-solid fa-bolt"></i></div>
+                <div><h2>NexaRide<span class="accent-dot">.</span></h2><small>DBMS v3.0</small></div>
+            </div>
+
+            <nav class="nav-list">
+                <a href="#" class="nav-link active" data-page="dashboard"><i class="fa-solid fa-chart-pie"></i><span>Dashboard</span></a>
+                <a href="#" class="nav-link" data-page="rides"><i class="fa-solid fa-route"></i><span>Ride Operations</span></a>
+                <a href="#" class="nav-link" data-page="drivers"><i class="fa-solid fa-id-badge"></i><span>Driver Fleet</span></a>
+                <a href="#" class="nav-link" data-page="analytics"><i class="fa-solid fa-chart-line"></i><span>Analytics</span></a>
+                <a href="#" class="nav-link" data-page="users"><i class="fa-solid fa-users"></i><span>Users Registry</span></a>
+                <a href="#" class="nav-link" data-page="sql"><i class="fa-solid fa-terminal"></i><span>SQL Terminal</span></a>
+            </nav>
+
+            <div class="sidebar-footer glass-subtle">
+                <img src="https://ui-avatars.com/api/?name=DB+Admin&background=d97706&color=fff&bold=true" class="avatar" alt="Admin">
+                <div><strong>DB Admin</strong><p class="text-xs text-muted">Superuser</p></div>
+                <div class="status-dot online"></div>
+            </div>
+        </aside>
+
+        <!-- ═══════════════ MAIN ═══════════════ -->
+        <main class="main-area">
+
+            <!-- Top Bar -->
+            <header class="topbar glass-subtle">
+                <div class="topbar-left">
+                    <button class="hamburger" id="menu-toggle"><i class="fa-solid fa-bars"></i></button>
+                    <h1 id="page-title">Dashboard</h1>
+                </div>
+                <div class="topbar-right">
+                    <div class="search-box">
+                        <i class="fa-solid fa-magnifying-glass"></i>
+                        <input type="text" placeholder="Search rides, drivers, users..." id="global-search">
+                    </div>
+                    <button class="icon-btn" id="notif-btn"><i class="fa-solid fa-bell"></i><span class="notif-badge">5</span></button>
+                    <div class="live-indicator"><span class="live-dot"></span>System Live</div>
+                </div>
+            </header>
+
+            <!-- ═══════════ PAGE: DASHBOARD ═══════════ -->
+            <section class="page active" id="page-dashboard">
+
+                <!-- KPI Row -->
+                <div class="kpi-row">
+                    <div class="kpi-card glass-card stagger-1">
+                        <div class="kpi-icon purple"><i class="fa-solid fa-car-side"></i></div>
+                        <div class="kpi-body">
+                            <p class="kpi-label">Total Rides</p>
+                            <h2 class="kpi-value counter" id="kpi-total-rides" data-target="14829">0</h2>
+                            <span class="kpi-trend up"><i class="fa-solid fa-arrow-up"></i> 12.4%</span>
+                        </div>
+                    </div>
+                    <div class="kpi-card glass-card stagger-2">
+                        <div class="kpi-icon green"><i class="fa-solid fa-indian-rupee-sign"></i></div>
+                        <div class="kpi-body">
+                            <p class="kpi-label">Net Revenue</p>
+                            <h2 class="kpi-value counter" id="kpi-net-revenue" data-target="284500">0</h2>
+                            <span class="kpi-trend up"><i class="fa-solid fa-arrow-up"></i> 8.7%</span>
+                        </div>
+                    </div>
+                    <div class="kpi-card glass-card stagger-3">
+                        <div class="kpi-icon blue"><i class="fa-solid fa-users"></i></div>
+                        <div class="kpi-body">
+                            <p class="kpi-label">Active Users</p>
+                            <h2 class="kpi-value counter" data-target="3842">0</h2>
+                            <span class="kpi-trend up"><i class="fa-solid fa-arrow-up"></i> 5.1%</span>
+                        </div>
+                    </div>
+                    <div class="kpi-card glass-card stagger-4">
+                        <div class="kpi-icon orange"><i class="fa-solid fa-star-half-stroke"></i></div>
+                        <div class="kpi-body">
+                            <p class="kpi-label">Avg Rating</p>
+                            <h2 class="kpi-value">4.72</h2>
+                            <span class="kpi-trend up"><i class="fa-solid fa-arrow-up"></i> 0.3%</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Charts Row -->
+                <div class="charts-row">
+                    <div class="chart-card glass-card stagger-5">
+                        <div class="card-header"><h3>Monthly Revenue Trend</h3><span class="chip">2024</span></div>
+                        <canvas id="revenueChart"></canvas>
+                    </div>
+                    <div class="chart-card chart-small glass-card stagger-6">
+                        <div class="card-header"><h3>Ride Status Split</h3></div>
+                        <canvas id="statusChart"></canvas>
+                        <div class="chart-legend" id="statusLegend"></div>
+                    </div>
+                </div>
+
+                <!-- Recent Activity & Audit Log -->
+                <div class="dashboard-grid-2">
+                    <div class="table-card glass-card stagger-7">
+                        <div class="card-header">
+                            <h3><i class="fa-solid fa-clock-rotate-left"></i> Recent Ride Transactions</h3>
+                            <span class="live-badge"><span class="live-dot"></span> Auto-refresh</span>
+                        </div>
+                        <div class="table-wrap">
+                            <table class="data-table" id="recent-rides-table">
+                                <thead>
+                                    <tr><th>Ride ID</th><th>Rider</th><th>Driver</th><th>Route</th><th>Fare</th><th>Payment</th><th>Status</th></tr>
+                                </thead>
+                                <tbody id="rides-tbody"></tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div class="audit-card glass-card stagger-8">
+                        <div class="card-header">
+                            <h3><i class="fa-solid fa-shield-halved"></i> DB Trigger Audit Log</h3>
+                        </div>
+                        <div class="audit-log-container" id="db-audit-log">
+                            <div class="audit-item info">
+                                <span class="audit-time">14:05:12</span>
+                                <div class="audit-body">
+                                    <strong>SYSTEM_BOOT</strong>
+                                    <p>NexaRide v3.0 Engine Initialized. Connection pool established.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ═══════════ PAGE: RIDE OPERATIONS ═══════════ -->
+            <section class="page" id="page-rides">
+                <!-- Map Row -->
+                <div class="map-row glass-card">
+                    <div class="card-header"><h3><i class="fa-solid fa-map-location-dot"></i> Live Route Map — Pune, Maharashtra</h3><span class="chip">Google Satellite + Live Traffic</span></div>
+                    <div id="ride-map"></div>
+                </div>
+                <!-- Controls Row -->
+                <div class="rides-controls-row">
+                    <!-- Booking Panel -->
+                    <div class="booking-panel glass-card">
+                        <div class="card-header"><h3><i class="fa-solid fa-location-arrow"></i> New Ride Dispatch</h3></div>
+                        <div class="form-body">
+                            <label class="form-label">Select User (Rider)</label>
+                            <div class="input-with-icon" style="margin-bottom: 0.8rem">
+                                <i class="fa-solid fa-user" style="color:#fbbf24"></i>
+                                <select id="user-input" class="location-select">
+                                    <!-- Populated dynamically via JS -->
+                                </select>
+                            </div>
+                            <label class="form-label">Pickup Location</label>
+                            <div class="input-with-icon">
+                                <i class="fa-solid fa-circle-dot" style="color:#34d399"></i>
+                                <select id="pickup-input" class="location-select">
+                                    <option value="shivajinagar">Shivajinagar, Pune</option>
+                                    <option value="hinjewadi">Hinjewadi IT Park</option>
+                                    <option value="koregaon">Koregaon Park</option>
+                                    <option value="deccan">Deccan Gymkhana</option>
+                                    <option value="kothrud">Kothrud</option>
+                                    <option value="viman">Viman Nagar</option>
+                                    <option value="baner">Baner</option>
+                                    <option value="swargate">Swargate Bus Stand</option>
+                                    <option value="magarpatta">Magarpatta City</option>
+                                    <option value="station">Pune Junction Station</option>
+                                </select>
+                            </div>
+                            <div class="route-connector"><div class="connector-line"></div></div>
+                            <label class="form-label">Drop-off Location</label>
+                            <div class="input-with-icon">
+                                <i class="fa-solid fa-location-dot" style="color:#f87171"></i>
+                                <select id="dropoff-input" class="location-select">
+                                    <option value="hinjewadi">Hinjewadi IT Park</option>
+                                    <option value="shivajinagar">Shivajinagar, Pune</option>
+                                    <option value="koregaon">Koregaon Park</option>
+                                    <option value="magarpatta">Magarpatta City</option>
+                                    <option value="station">Pune Junction Station</option>
+                                    <option value="deccan">Deccan Gymkhana</option>
+                                    <option value="kothrud">Kothrud</option>
+                                    <option value="viman">Viman Nagar</option>
+                                    <option value="baner">Baner</option>
+                                    <option value="swargate">Swargate Bus Stand</option>
+                                </select>
+                            </div>
+
+                            <label class="form-label" style="margin-top:1rem">Select Vehicle Class</label>
+                            <div class="vehicle-grid" style="grid-template-columns: repeat(3, 1fr);">
+                                <div class="v-option" data-type="BIKE" data-fare="6"><i class="fa-solid fa-motorcycle"></i><span>Bike</span><small>₹15/km</small></div>
+                                <div class="v-option" data-type="AUTO" data-fare="10"><i class="fa-solid fa-taxi"></i><span>Auto</span><small>₹20/km</small></div>
+                                <div class="v-option active" data-type="SEDAN" data-fare="45"><i class="fa-solid fa-car-side"></i><span>Sedan</span><small>₹35/km</small></div>
+                                <div class="v-option" data-type="SUV" data-fare="68"><i class="fa-solid fa-truck-monster"></i><span>SUV</span><small>₹50/km</small></div>
+                                <div class="v-option" data-type="LUXURY" data-fare="110"><i class="fa-solid fa-gem"></i><span>Luxury</span><small>₹80/km</small></div>
+                                <div class="v-option" data-type="HATCHBACK" data-fare="30"><i class="fa-solid fa-car"></i><span>Hatch</span><small>₹25/km</small></div>
+                            </div>
+
+                            <div class="fare-summary glass-subtle">
+                                <div class="fare-row"><span>Base Fare</span><strong id="fare-base">₹30.00</strong></div>
+                                <div class="fare-row"><span>Distance</span><strong id="fare-dist">— km</strong></div>
+                                <div class="fare-row"><span>Surge Multiplier</span><strong class="text-orange" id="fare-surge">×1.0</strong></div>
+                                <div class="fare-row total"><span>Estimated Total</span><strong id="fare-total">₹0.00</strong></div>
+                            </div>
+
+                            <button class="btn-action" id="dispatch-ride-btn"><i class="fa-solid fa-paper-plane"></i> Dispatch & Execute Trigger</button>
+                        </div>
+                    </div>
+
+                    <!-- Payment Panel -->
+                    <div class="payment-panel glass-card">
+                        <div class="card-header"><h3><i class="fa-solid fa-credit-card"></i> Payment Gateway</h3></div>
+                        <div class="payment-methods">
+                            <div class="pay-option active" data-method="UPI"><i class="fa-solid fa-mobile-screen"></i> UPI</div>
+                            <div class="pay-option" data-method="WALLET"><i class="fa-solid fa-wallet"></i> Wallet</div>
+                            <div class="pay-option" data-method="CARD"><i class="fa-brands fa-cc-visa"></i> Card</div>
+                            <div class="pay-option" data-method="CASH"><i class="fa-solid fa-money-bill-wave"></i> Cash</div>
+                        </div>
+                        <div class="wallet-balance glass-subtle">
+                            <span>Wallet Balance</span><strong class="text-green" id="wallet-balance-display">₹1,800.00</strong>
+                        </div>
+                        <button class="btn-action secondary" id="process-payment-btn"><i class="fa-solid fa-lock"></i> Process Secure Payment</button>
+                    </div>
+
+                    <!-- Rating Panel -->
+                    <div class="rating-panel glass-card" id="rating-panel-card">
+                        <div class="card-header"><h3><i class="fa-solid fa-star"></i> Rate Your Experience</h3></div>
+                        <div id="rating-placeholder" class="output-placeholder" style="padding: 2rem; text-align: center;">
+                            <i class="fa-solid fa-star-half-stroke" style="font-size: 2rem; margin-bottom: 0.5rem"></i>
+                            <p>Dispatch a ride to enable rating</p>
+                        </div>
+                        <div id="rating-active-content" style="display: none">
+                            <div class="rating-driver-info">
+                                <img src="" class="driver-avatar" alt="Driver" id="rating-driver-img">
+                                <div><strong id="rating-driver-name"></strong><p class="text-muted text-xs" id="rating-driver-meta"></p></div>
+                            </div>
+                            <div class="star-rating" id="star-rating">
+                                <i class="fa-solid fa-star" data-val="1"></i>
+                                <i class="fa-solid fa-star" data-val="2"></i>
+                                <i class="fa-solid fa-star" data-val="3"></i>
+                                <i class="fa-solid fa-star" data-val="4"></i>
+                                <i class="fa-solid fa-star" data-val="5"></i>
+                            </div>
+                            <textarea class="review-input" id="rating-review-text" placeholder="Write a review..."></textarea>
+                            <button class="btn-action small" id="submit-rating-btn"><i class="fa-solid fa-check"></i> Submit Rating</button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ═══════════ PAGE: DRIVER FLEET ═══════════ -->
+            <section class="page" id="page-drivers">
+                <div class="driver-grid" id="driver-grid"></div>
+            </section>
+
+            <!-- ═══════════ PAGE: USERS REGISTRY ═══════════ -->
+            <section class="page" id="page-users">
+                <div class="table-card glass-card">
+                    <div class="card-header">
+                        <h3><i class="fa-solid fa-users"></i> Registered Users (SELECT * FROM Users)</h3>
+                        <div class="header-actions">
+                            <span class="chip" id="users-total-chip">Total: 48 active</span>
+                        </div>
+                    </div>
+                    <div class="table-wrap">
+                        <table class="data-table">
+                            <thead>
+                                <tr><th>User ID</th><th>Name</th><th>Email/Phone</th><th>Registration</th><th>Wallet</th><th>Status</th></tr>
+                            </thead>
+                            <tbody id="users-tbody"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ═══════════ PAGE: ANALYTICS ═══════════ -->
+            <section class="page" id="page-analytics">
+                <div class="analytics-layout">
+                    <div class="chart-card glass-card">
+                        <div class="card-header"><h3>Payment Method Distribution</h3></div>
+                        <canvas id="paymentChart"></canvas>
+                    </div>
+                    <div class="chart-card glass-card">
+                        <div class="card-header"><h3>Peak Hour Demand Heatmap</h3></div>
+                        <div class="heatmap-grid" id="heatmap"></div>
+                    </div>
+                    <div class="chart-card glass-card full-span">
+                        <div class="card-header"><h3>Driver Performance Comparison (Window Function: RANK)</h3></div>
+                        <canvas id="driverPerfChart"></canvas>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ═══════════ PAGE: SQL TERMINAL ═══════════ -->
+            <section class="page" id="page-sql">
+                <div class="sql-layout">
+                    <div class="sql-editor-panel glass-card">
+                        <div class="card-header">
+                            <h3><i class="fa-solid fa-code"></i> SQL Query Editor</h3>
+                            <div class="sql-actions">
+                                <select id="query-preset" class="sql-select">
+                                    <option value="">-- Load Preset Query --</option>
+                                    <option value="q1">Q1: Full Ride Receipt (INNER JOIN)</option>
+                                    <option value="q2">Q2: User Spend Report (LEFT JOIN)</option>
+                                    <option value="q3">Q3: Luxury Drivers (Subquery)</option>
+                                    <option value="q4">Q4: Revenue by Driver (GROUP BY + HAVING)</option>
+                                    <option value="q5">Q5: Driver Leaderboard (RANK Window Func)</option>
+                                    <option value="q6">Q6: Cumulative Revenue (SUM OVER)</option>
+                                    <option value="q7">Q7: Cancellation Analysis</option>
+                                    <option value="q8">Q8: Top 3 Lucrative Drivers</option>
+                                </select>
+                                <button class="btn-action small" id="run-query-btn"><i class="fa-solid fa-play"></i> Execute</button>
+                            </div>
+                        </div>
+                        <div class="editor-area">
+                            <div class="line-numbers" id="line-numbers"></div>
+                            <textarea id="sql-input" spellcheck="false">-- Write your MySQL query here...
+SELECT * FROM Rides WHERE status = 'COMPLETED';</textarea>
+                        </div>
+                    </div>
+                    <div class="sql-output-panel glass-card">
+                        <div class="card-header">
+                            <h3><i class="fa-solid fa-table"></i> Query Results</h3>
+                            <div class="result-meta" id="result-meta"></div>
+                        </div>
+                        <div class="output-area" id="sql-output">
+                            <div class="output-placeholder">
+                                <i class="fa-solid fa-database"></i>
+                                <p>Execute a query to see results</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+        </main>
+    </div>
+
+    <!-- Driver Modal -->
+    <div class="modal-overlay" id="driver-modal">
+        <div class="modal-content glass-card">
+            <button class="modal-close" id="modal-close"><i class="fa-solid fa-xmark"></i></button>
+            <div class="modal-header" id="modal-header"></div>
+            <div class="modal-body" id="modal-body"></div>
+        </div>
+    </div>
+
+    <!-- Toast -->
+    <div class="toast-container" id="toast-container"></div>
+
+    <script src="./app.js"></script>
+</body>
+</html>
